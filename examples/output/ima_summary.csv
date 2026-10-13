@@ -1,0 +1,17 @@
+item,value
+risk factors total,78.0
+risk factors failing RFET (NMRF),9.0
+reduced set size (modellable),30.0
+"ES_F,C current, full set (USD)",3655733.816357518
+"ES_R,C current, reduced set (USD)",3575821.290614182
+"ES_R,C / ES_F,C (needs >= 0.75)",0.9781404966122619
+"ES_R,S stressed, reduced set (USD)",12915689.999047464
+stressed window start scenario (planted at day 700),665.0
+"ES = ES_R,S x max(ES_F,C / ES_R,C, 1) (USD)",13204330.097547617
+IMCC with rho = 0.5 (USD),16570903.342228603
+SES (USD),1896905.8459576352
+IMCC + SES (USD),18467809.18818624
+"plain 10-day ES, all horizons forced to 10 (USD)",3503879.416697856
+"liquidity-adjusted cascade ES, current window (USD)",3655733.816357518
+"amber zone starts at (250 obs, 99%)",5.0
+"red zone starts at (250 obs, 99%)",10.0

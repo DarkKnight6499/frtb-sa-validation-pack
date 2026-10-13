@@ -1,0 +1,11 @@
+metric,value,green_max,amber_max,status
+max_abs_z_vs_mc,1.9978479095815307,3.0,4.0,Green
+max_abs_diff_european_vs_fd,0.00038646096908667715,0.01,0.03,Green
+max_abs_diff_american_tree_vs_fd,0.002531557098395254,0.01,0.03,Green
+max_parity_residual,1.78e-14,1e-09,1e-06,Green
+max_rel_diff_delta_european,0.0009151384676276914,0.01,0.03,Green
+tree_oscillation_amplitude,0.0006146001860498629,0.005,0.02,Green
+rmse_vol_pts_in_band,1.1605165613184414,0.5,1.0,Red
+rmse_vol_pts_all_quotes,3.734940832171789,1.0,2.0,Red
+hedge_std_over_premium_model_vol,0.047812298194183804,0.05,0.1,Green
+hedge_std_over_premium_vol_shock,0.2051015489536884,0.1,0.2,Red
