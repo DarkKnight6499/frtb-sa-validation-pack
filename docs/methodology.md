@@ -39,4 +39,4 @@ The model under test is a flat-volatility Black-Scholes-Merton closed form for E
 
 ## 6. Out of scope and future work
 
-A regulatory assistant that answers questions over the Basel text and the SR 11-7 guidance using retrieval and a language model is a possible extension and is not implemented. Securitisation and CTP treatments, commodities and jurisdictional add-ons are also not implemented.
+A regulatory assistant that answers questions over the Basel text and the SR 26-2 guidance using retrieval and a language model is a possible extension and is not implemented. Securitisation and CTP treatments, commodities and jurisdictional add-ons are also not implemented.

@@ -1,6 +1,6 @@
 # Independent Model Validation Report: Vanilla Option Pricer
 
-Structured after the headings of Supervisory Guidance on Model Risk Management (SR 11-7, Board of Governors of the Federal Reserve System and OCC, April 2011): Model Development, Implementation, and Use; Model Validation (Evaluation of Conceptual Soundness, Ongoing Monitoring, Outcomes Analysis); Governance. All figures below were produced by `examples/run_validation.py` on synthetic inputs with fixed seeds.
+Structured after the sections of the Supervisory Guidance on Model Risk Management issued April 17, 2026 by the Federal Reserve (SR 26-2), the OCC and the FDIC, which superseded SR 11-7: model risk and materiality (section III), development and use (IV), validation through conceptual soundness, outcomes analysis and ongoing monitoring (V), and governance and controls (VI). The guidance is non-prescriptive, so this report is a paraphrase of structure and not a compliance artefact. All figures below were produced by `examples/run_validation.py` on synthetic inputs with fixed seeds.
 
 ## 1. Executive Summary
 
@@ -22,11 +22,20 @@ Challengers built independently for this validation:
 - Monte Carlo with antithetic draws and a regression control variate (the discounted terminal price), 200,000 paths.
 - Crank-Nicolson finite differences in log price with Rannacher start-up and Brennan-Schwartz projection for early exercise, 800 space and 800 time steps.
 
-Intended use is not documented for this synthetic model, so every strike and maturity on the test grid is treated as in scope.
+Statement of purpose (section IV expects development to begin with one): intended use is not documented for this synthetic model, so every strike and maturity on the test grid is treated as in scope, and that gap is itself recorded as a finding.
+
+Materiality and proportionate scope (section III). The ratings below are assumptions of this exercise, not observations of a bank.
+
+| Factor | Assessment | Basis |
+|---|---|---|
+| Inherent risk | Medium | Few assumptions, but one (flat volatility) drives the result; constant rates and yield |
+| Model exposure | Assumed large | Stand-in for an options book priced and hedged off this model; no real portfolio |
+| Model purpose | Higher | Pricing and hedging of financial risk exposures, which the guidance treats as higher risk |
+| Materiality and validation depth | High: full scope | Conceptual soundness, challenger models, outcomes analysis and ongoing monitoring all performed |
 
 ## 3. Conceptual Soundness
 
-SR 11-7 asks for an evaluation of design, theory and assumptions. Property checks:
+SR 26-2 section V asks for an assessment and documentation of model design, assumptions and data selection, and allows benchmarking where a theory review is impractical. Property checks:
 
 | Check | Passed | Detail |
 |---|---|---|
@@ -199,28 +208,9 @@ Finite-difference grid, American put against an 8000-step tree (6.660572); fitte
 | American put | delta | 110 | 1.00 | -0.64104 | -0.64103 | 0.00002 | 0.00003 |
 | American put | gamma | 110 | 1.00 | 0.02370 | 0.02370 | 0.00001 | 0.00032 |
 
-## 5. Ongoing Monitoring
+## 5. Outcomes Analysis
 
-Metrics, thresholds and current status. Thresholds are policy choices set for this exercise; Green is at or below the green bound, Amber at or below the amber bound, Red above it.
-
-| metric | value | green_max | amber_max | status |
-|---|---|---|---|---|
-| max_abs_z_vs_mc | 1.99785 | 3 | 4 | Green |
-| max_abs_diff_european_vs_fd | 0.000386461 | 0.01 | 0.03 | Green |
-| max_abs_diff_american_tree_vs_fd | 0.00253156 | 0.01 | 0.03 | Green |
-| max_parity_residual | 1.78e-14 | 1e-09 | 1e-06 | Green |
-| max_rel_diff_delta_european | 0.000915138 | 0.01 | 0.03 | Green |
-| tree_oscillation_amplitude | 0.0006146 | 0.005 | 0.02 | Green |
-| rmse_vol_pts_in_band | 1.16052 | 0.5 | 1 | Red |
-| rmse_vol_pts_all_quotes | 3.73494 | 1 | 2 | Red |
-| hedge_std_over_premium_model_vol | 0.0478123 | 0.05 | 0.1 | Green |
-| hedge_std_over_premium_vol_shock | 0.205102 | 0.1 | 0.2 | Red |
-
-Statuses: 7 Green, 0 Amber, 3 Red. Re-run the pack on every model change and at least quarterly.
-
-## 6. Outcomes Analysis
-
-### 6.1 Model prices against a synthetic smile market
+### 5.1 Model prices against a synthetic smile market
 
 The market is generated from a stated smile, `sigma(K, T) = 0.20 + 0.02 exp(-T) - 0.15 m + 0.40 m^2` with `m = ln(K/F)`, plus 0.2 vol point of quote noise. Out-of-the-money options are quoted. The model reprices each quote at its flat 20% volatility and the table gives the implied-vol error.
 
@@ -249,7 +239,7 @@ The market is generated from a stated smile, `sigma(K, T) = 0.20 + 0.02 exp(-T) 
 
 Limit test: inside the band |ln(K/F)| <= 0.10 the absolute vol error must stay within 1.0 point for at least 95% of quotes. Result: 4 breaches in 8 in-band quotes (50%), RMSE 1.16 points in band and 3.73 over all quotes. **Limit failed.**
 
-### 6.2 Delta-hedging backtest
+### 5.2 Delta-hedging backtest
 
 One-year at-the-money call sold at the model price and delta hedged at the model volatility, 250 steps, 2,000 simulated paths. Error is terminal hedge value minus payoff.
 
@@ -261,9 +251,28 @@ One-year at-the-money call sold at the model price and delta hedged at the model
 
 Premium is 9.2270. Limit: standard deviation of error within 10% of premium.
 
+## 6. Ongoing Monitoring
+
+Metrics, thresholds and current status. Thresholds are policy choices set for this exercise; Green is at or below the green bound, Amber at or below the amber bound, Red above it.
+
+| metric | value | green_max | amber_max | status |
+|---|---|---|---|---|
+| max_abs_z_vs_mc | 1.99785 | 3 | 4 | Green |
+| max_abs_diff_european_vs_fd | 0.000386461 | 0.01 | 0.03 | Green |
+| max_abs_diff_american_tree_vs_fd | 0.00253156 | 0.01 | 0.03 | Green |
+| max_parity_residual | 1.78e-14 | 1e-09 | 1e-06 | Green |
+| max_rel_diff_delta_european | 0.000915138 | 0.01 | 0.03 | Green |
+| tree_oscillation_amplitude | 0.0006146 | 0.005 | 0.02 | Green |
+| rmse_vol_pts_in_band | 1.16052 | 0.5 | 1 | Red |
+| rmse_vol_pts_all_quotes | 3.73494 | 1 | 2 | Red |
+| hedge_std_over_premium_model_vol | 0.0478123 | 0.05 | 0.1 | Green |
+| hedge_std_over_premium_vol_shock | 0.205102 | 0.1 | 0.2 | Red |
+
+Statuses: 7 Green, 0 Amber, 3 Red. Re-run the pack on every model change and at least quarterly.
+
 ## 7. Limitations and Assumptions
 
-- The market data in section 6 is synthetic; the smile is a stated function, not an observation.
+- The market data in section 5 is synthetic; the smile is a stated function, not an observation.
 - Monte Carlo results carry sampling error; the challenger Greeks use common random numbers and finite differences.
 - The PDE challenger covers European options and American puts. American calls and discrete dividends are untested.
 - Rates and dividend yield are constant; no stochastic volatility, jumps or funding effects are modelled or tested.
@@ -285,7 +294,16 @@ Severity scale: High (limit breached with material error, or a conceptual check 
 | F8 | Low | Limitations and assumptions | American calls priced by the front-office tree have no independent challenger: the PDE solver implemented here supports American puts only. | Extend the challenger to calls before approving the model for American calls with dividends. |
 | F9 | Info | Conceptual soundness | 12 of 12 conceptual soundness checks passed. | None. |
 
-## 9. Conclusion
+## 9. Governance and Use Conditions
+
+Section VI expects clear roles and accountability, managed conflicts of interest, documentation and tracking of recommendations and exceptions. For this exercise:
+
+- Roles: the pricer, the challengers and this report were all written by one author, so independence between development and validation is simulated and not demonstrated. In practice this report would sit with a separate validation team with standing to require changes (the effective challenge described in section III).
+- Documentation and tracking: every finding has an ID, severity and recommendation in section 8, and the table is written to `examples/output/validation_findings.csv` for status tracking.
+- Use before validation: none. No exception is recorded.
+- Extension of use (section IV): until a smile-aware model replaces it, pricing outside the in-band moneyness range should be limited or overlaid, and any new use should trigger its own review.
+
+## 10. Conclusion
 
 Not approved: at least one High finding is open.
 

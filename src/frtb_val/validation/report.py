@@ -1,4 +1,4 @@
-"""Markdown rendering helpers and the SR 11-7 structured validation report."""
+"""Markdown rendering helpers and the SR 26-2 structured validation report."""
 from __future__ import annotations
 
 import pandas as pd
@@ -38,10 +38,12 @@ def render_report(r: ValidationResults) -> str:
     w = out.append
     w("# Independent Model Validation Report: Vanilla Option Pricer")
     w("")
-    w("Structured after the headings of Supervisory Guidance on Model Risk Management (SR 11-7, Board of Governors of the "
-      "Federal Reserve System and OCC, April 2011): Model Development, Implementation, and Use; Model Validation "
-      "(Evaluation of Conceptual Soundness, Ongoing Monitoring, Outcomes Analysis); Governance. All figures below were "
-      "produced by `examples/run_validation.py` on synthetic inputs with fixed seeds.")
+    w("Structured after the sections of the Supervisory Guidance on Model Risk Management issued April 17, 2026 by the Federal "
+      "Reserve (SR 26-2), the OCC and the FDIC, which superseded SR 11-7: model risk and materiality (section III), "
+      "development and use (IV), validation through conceptual soundness, outcomes analysis and ongoing monitoring (V), "
+      "and governance and controls (VI). The guidance is non-prescriptive, so this report is a paraphrase of structure "
+      "and not a compliance artefact. All figures below were produced by `examples/run_validation.py` on synthetic inputs "
+      "with fixed seeds.")
     w("")
     w("## 1. Executive Summary")
     w("")
@@ -72,12 +74,27 @@ def render_report(r: ValidationResults) -> str:
     w(f"- Crank-Nicolson finite differences in log price with Rannacher start-up and Brennan-Schwartz projection for "
       f"early exercise, {B.FD_GRID} space and {B.FD_GRID} time steps.")
     w("")
-    w("Intended use is not documented for this synthetic model, so every strike and maturity on the test grid is treated "
-      "as in scope.")
+    w("Statement of purpose (section IV expects development to begin with one): intended use is not documented for this "
+      "synthetic model, so every strike and maturity on the test grid is treated as in scope, and that gap is itself "
+      "recorded as a finding.")
+    w("")
+    w("Materiality and proportionate scope (section III). The ratings below are assumptions of this exercise, not "
+      "observations of a bank.")
+    w("")
+    w(md_table(pd.DataFrame([
+        {"Factor": "Inherent risk", "Assessment": "Medium",
+         "Basis": "Few assumptions, but one (flat volatility) drives the result; constant rates and yield"},
+        {"Factor": "Model exposure", "Assessment": "Assumed large",
+         "Basis": "Stand-in for an options book priced and hedged off this model; no real portfolio"},
+        {"Factor": "Model purpose", "Assessment": "Higher",
+         "Basis": "Pricing and hedging of financial risk exposures, which the guidance treats as higher risk"},
+        {"Factor": "Materiality and validation depth", "Assessment": "High: full scope",
+         "Basis": "Conceptual soundness, challenger models, outcomes analysis and ongoing monitoring all performed"},
+    ])))
     w("")
     w("## 3. Conceptual Soundness")
     w("")
-    w("SR 11-7 asks for an evaluation of design, theory and assumptions. Property checks:")
+    w("SR 26-2 section V asks for an assessment and documentation of model design, assumptions and data selection, and allows benchmarking where a theory review is impractical. Property checks:")
     w("")
     w(md_table(pd.DataFrame(r.conceptual).rename(columns={"check": "Check", "passed": "Passed", "detail": "Detail"})))
     w("")
@@ -120,20 +137,9 @@ def render_report(r: ValidationResults) -> str:
     w("")
     w(md_table(r.greeks, "{:,.5f}", {"strike": "{:.0f}", "maturity": "{:.2f}"}))
     w("")
-    w("## 5. Ongoing Monitoring")
+    w("## 5. Outcomes Analysis")
     w("")
-    w("Metrics, thresholds and current status. Thresholds are policy choices set for this exercise; Green is at or below "
-      "the green bound, Amber at or below the amber bound, Red above it.")
-    w("")
-    mon = r.monitoring.copy()
-    w(md_table(mon, "{:,.6g}"))
-    w("")
-    w(f"Statuses: {(mon['status'] == 'Green').sum()} Green, {(mon['status'] == 'Amber').sum()} Amber, "
-      f"{(mon['status'] == 'Red').sum()} Red. Re-run the pack on every model change and at least quarterly.")
-    w("")
-    w("## 6. Outcomes Analysis")
-    w("")
-    w("### 6.1 Model prices against a synthetic smile market")
+    w("### 5.1 Model prices against a synthetic smile market")
     w("")
     w("The market is generated from a stated smile, `sigma(K, T) = 0.20 + 0.02 exp(-T) - 0.15 m + 0.40 m^2` with "
       "`m = ln(K/F)`, plus 0.2 vol point of quote noise. Out-of-the-money options are quoted. The model reprices each "
@@ -148,7 +154,7 @@ def render_report(r: ValidationResults) -> str:
       f"breaches in {s['n_in_band']} in-band quotes ({s['breach_rate']:.0%}), RMSE {s['rmse_vol_pts_in_band']:.2f} points in "
       f"band and {s['rmse_vol_pts']:.2f} over all quotes. **Limit {'passed' if s['limit_passed'] else 'failed'}.**")
     w("")
-    w("### 6.2 Delta-hedging backtest")
+    w("### 5.2 Delta-hedging backtest")
     w("")
     w("One-year at-the-money call sold at the model price and delta hedged at the model volatility, 250 steps, "
       f"{r.hedge_base['n_paths']:,} simulated paths. Error is terminal hedge value minus payoff.")
@@ -165,9 +171,20 @@ def render_report(r: ValidationResults) -> str:
     w("")
     w(f"Premium is {r.hedge_base['premium']:.4f}. Limit: standard deviation of error within {O.HEDGE_STD_LIMIT:.0%} of premium.")
     w("")
+    w("## 6. Ongoing Monitoring")
+    w("")
+    w("Metrics, thresholds and current status. Thresholds are policy choices set for this exercise; Green is at or below "
+      "the green bound, Amber at or below the amber bound, Red above it.")
+    w("")
+    mon = r.monitoring.copy()
+    w(md_table(mon, "{:,.6g}"))
+    w("")
+    w(f"Statuses: {(mon['status'] == 'Green').sum()} Green, {(mon['status'] == 'Amber').sum()} Amber, "
+      f"{(mon['status'] == 'Red').sum()} Red. Re-run the pack on every model change and at least quarterly.")
+    w("")
     w("## 7. Limitations and Assumptions")
     w("")
-    w("- The market data in section 6 is synthetic; the smile is a stated function, not an observation.")
+    w("- The market data in section 5 is synthetic; the smile is a stated function, not an observation.")
     w("- Monte Carlo results carry sampling error; the challenger Greeks use common random numbers and finite differences.")
     w("- The PDE challenger covers European options and American puts. American calls and discrete dividends are untested.")
     w("- Rates and dividend yield are constant; no stochastic volatility, jumps or funding effects are modelled or tested.")
@@ -181,7 +198,21 @@ def render_report(r: ValidationResults) -> str:
     w(md_table(r.findings.rename(columns={"id": "ID", "severity": "Severity", "area": "Area", "evidence": "Evidence",
                                            "recommendation": "Recommendation"})))
     w("")
-    w("## 9. Conclusion")
+    w("## 9. Governance and Use Conditions")
+    w("")
+    w("Section VI expects clear roles and accountability, managed conflicts of interest, documentation and tracking of "
+      "recommendations and exceptions. For this exercise:")
+    w("")
+    w("- Roles: the pricer, the challengers and this report were all written by one author, so independence between "
+      "development and validation is simulated and not demonstrated. In practice this report would sit with a separate "
+      "validation team with standing to require changes (the effective challenge described in section III).")
+    w("- Documentation and tracking: every finding has an ID, severity and recommendation in section 8, "
+      "and the table is written to `examples/output/validation_findings.csv` for status tracking.")
+    w("- Use before validation: none. No exception is recorded.")
+    w("- Extension of use (section IV): until a smile-aware model replaces it, pricing outside the in-band moneyness "
+      "range should be limited or overlaid, and any new use should trigger its own review.")
+    w("")
+    w("## 10. Conclusion")
     w("")
     w(r.conclusion)
     w("")

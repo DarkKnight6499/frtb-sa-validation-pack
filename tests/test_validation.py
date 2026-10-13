@@ -1,4 +1,4 @@
-"""Tests for the pricers, challengers, outcomes analysis, findings and the SR 11-7 report."""
+"""Tests for the pricers, challengers, outcomes analysis, findings and the SR 26-2 report."""
 import math
 import re
 import sys
@@ -262,12 +262,12 @@ class FullValidationRun(unittest.TestCase):
         self.assertEqual(set(m["metric"]), set(MONITORING_THRESHOLDS))
         self.assertTrue(set(m["status"]) <= {"Green", "Amber", "Red"})
 
-    def test_report_has_sr_11_7_headings_in_order(self):
+    def test_report_has_sr_26_2_headings_in_order(self):
         heads = re.findall(r"^## (\d+)\. (.+)$", self.report, flags=re.M)
         self.assertEqual([h[1] for h in heads], ["Executive Summary", "Model Description", "Conceptual Soundness",
-                                                 "Developmental Evidence", "Ongoing Monitoring", "Outcomes Analysis",
+                                                 "Developmental Evidence", "Outcomes Analysis", "Ongoing Monitoring",
                                                  "Limitations and Assumptions", "Findings and Recommendations",
-                                                 "Conclusion"])
+                                                 "Governance and Use Conditions", "Conclusion"])
 
     def test_report_contains_computed_numbers_not_placeholders(self):
         self.assertNotIn("TODO", self.report)

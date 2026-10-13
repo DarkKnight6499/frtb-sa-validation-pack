@@ -1,6 +1,6 @@
 # frtb-sa-validation-pack
 
-A small, readable Python implementation of Basel FRTB market risk capital (standardised approach and a simplified internal models approach) on a synthetic trading book, plus an SR 11-7 style independent validation of an option pricer. Runtime dependencies are numpy and pandas only. Every input is synthetic and seeded.
+A small, readable Python implementation of Basel FRTB market risk capital (standardised approach and a simplified internal models approach) on a synthetic trading book, plus an SR 26-2 style independent validation of an option pricer. Runtime dependencies are numpy and pandas only. Every input is synthetic and seeded.
 
 ## What is in it
 
@@ -51,7 +51,7 @@ Validation (`examples/run_validation.py`): the closed form agrees with Monte Car
 
 - Risk weights, correlations, gammas, DRC weights, the RFET criteria, the ES and SES formulas, backtesting zones and PLA thresholds follow the Basel text (BCBS d457, January 2019, MAR20 to MAR33), with the paragraph cited next to each constant in `frtb_sa/params.py` and the `ima` modules. They were read from the published document, not from memory. Jurisdictional rules (for example the US or EU implementations) differ and are not modelled.
 - Stylized, not from the text: the synthetic book and market, the factor model and Student-t panel behind IMA P&L, delta-gamma P&L, the planted stress window, the mapping of the synthetic risk factors to liquidity horizon categories, the reduced set selection rule, the NMRF stress scenario (a simplified calibration), desk definitions for PLA, and all validation limits, monitoring thresholds and severity scales.
-- The SR 11-7 report follows the guidance's headings and is a paraphrase of structure, not a compliance artefact. The synthetic smile and the findings are illustrative.
+- The validation report follows the sections of the April 2026 interagency guidance (SR 26-2, which superseded SR 11-7) and is a paraphrase of structure, not a compliance artefact. The synthetic smile and the findings are illustrative.
 - The book contains no GIRR or CSR options, so GIRR vega, CSR vega and CSR curvature are implemented and unit tested on constructed inputs but show zero in the shipped run.
 - Not implemented: securitisation and correlation trading portfolio treatments, the commodity risk class, DRC under the IMA, and jurisdiction specific add-ons. An LLM based regulatory assistant is future work only.
 - Monte Carlo and hedging outputs depend on the seeds and path counts set in each example's config block.

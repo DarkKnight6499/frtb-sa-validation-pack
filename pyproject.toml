@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "frtb-val"
 version = "0.1.0"
-description = "FRTB standardised approach and internal models toy engine with an SR 11-7 style model validation pack, on synthetic data"
+description = "FRTB standardised approach and internal models toy engine with an SR 26-2 style model validation pack, on synthetic data"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["numpy>=1.26", "pandas>=2.1"]

@@ -1,4 +1,4 @@
-"""Conceptual soundness checks on the front-office pricer (SR 11-7, evaluation of conceptual soundness)."""
+"""Conceptual soundness checks on the front-office pricer (SR 26-2 section V, conceptual soundness)."""
 from __future__ import annotations
 
 import math
